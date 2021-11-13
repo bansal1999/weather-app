@@ -1,9 +1,22 @@
-const request = require("request");
+const geoCode = require("./utils/geoCode");
+const forecast = require("./utils/forecast");
 
-const url =
-  "http://api.weatherstack.com/current?access_key=aee502916a3d0d0b3b002272afbfb82f&query=37.8267,-122.4233";
+const address = process.argv[2];
 
-request({ url: url }, (error, response) => {
-  const data = JSON.parse(response.body);
-  console.log(data.current);
-});
+if (!address) {
+  console.log("Please provide a valid address");
+} else {
+  geoCode(address, (error, { latitude, longitude, location } = {}) => {
+    if (error) {
+      return console.error(error);
+    }
+
+    forecast(latitude, longitude, (error, forecastData) => {
+      if (error) {
+        return console.error(error);
+      }
+      console.log(location);
+      console.log(forecastData);
+    });
+  });
+}
